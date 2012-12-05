@@ -222,9 +222,9 @@ crc校验结果
 */
 short CFSKModem::CalculateCRC(BYTE *buf,int len)
 {
-	unsigned char hi,lo;
+	BYTE hi,lo;
 	int i;
-	unsigned char j;
+	BYTE j;
 	short crc;
 	crc=0xFFFF;
 	for (i=0;i<len;i++)
@@ -232,7 +232,7 @@ short CFSKModem::CalculateCRC(BYTE *buf,int len)
 		crc=crc ^ *buf;
 		for(j=0;j<8;j++)
 		{
-			unsigned char chk;
+			BYTE chk;
 			chk=crc&1;
 			crc=crc>>1;
 			crc=crc&0x7fff;
@@ -284,7 +284,7 @@ void CFSKModem::FindFrame(short *pData, unsigned long len, long *start, long *en
 {
 	unsigned long i, j;
 	unsigned long E;
-	unsigned char flag = 0;
+	BYTE flag = 0;
 
 	*start = *end = -1;
 	if(len < 128)
@@ -475,7 +475,7 @@ endLow:
 函数返回值说明:   
 使用的资源 
 ******************************************/
-unsigned char CFSKModem::FindHead(short * InDataBuf,unsigned long lenth,unsigned long *endlen,unsigned char MobileType)
+BYTE CFSKModem::FindHead(short * InDataBuf,unsigned long lenth,unsigned long *endlen,BYTE MobileType)
 {
 	unsigned long i = 0;//指向第i个点
 
@@ -486,7 +486,7 @@ unsigned char CFSKModem::FindHead(short * InDataBuf,unsigned long lenth,unsigned
 	unsigned long NumberOfLow = 0;//小幅度波的个数
 	unsigned long DataHead = 0;//同步头
 	unsigned long datastart = 0;//当前在解的波的开始点
-	unsigned char bit0flag = 0;//用于实现两个小波表示1
+	BYTE bit0flag = 0;//用于实现两个小波表示1
 
 	for(;i<lenth;)
 	{   
@@ -588,8 +588,8 @@ MmobileType  手机类型
 函数返回值说明:    0为出错，1为成功解出8位数据
 使用的资源 
 ******************************************/
-unsigned char CFSKModem::GetAllData(unsigned char *OutDataBuf, short *InDataBuf,
-									unsigned long lenth,unsigned long *endlen,unsigned char MobileType)
+BYTE CFSKModem::GetAllData(BYTE *OutDataBuf, short *InDataBuf,
+									unsigned long lenth,unsigned long *endlen,BYTE MobileType)
 {	
 	unsigned long i = *endlen - 1;//指向第i个点
 	unsigned long j = 0;//指向第j个解出的数据
@@ -600,8 +600,8 @@ unsigned char CFSKModem::GetAllData(unsigned char *OutDataBuf, short *InDataBuf,
 	float	RatioOfZorePassage = 0;//过零点这一次的比率
 	unsigned long datastart = 0;//当前在解的波的开始点
 
-	unsigned char bit0flag = 0;//用于实现两个小波表示1
-	unsigned char bitindex = 0;//解出来的数据的位数
+	BYTE bit0flag = 0;//用于实现两个小波表示1
+	BYTE bitindex = 0;//解出来的数据的位数
 	unsigned short crc = 0;//用于校验
 	/************************************/		
 	//下面的参数用于实现0 、1 幅度的对比//
@@ -768,8 +768,8 @@ unsigned char CFSKModem::GetAllData(unsigned char *OutDataBuf, short *InDataBuf,
 			/*************************************************************************CRC16**/
 			crc = OutDataBuf[DataLenth] | (OutDataBuf[DataLenth + 1] << 8);
 
-			/*	unsigned char OutDataBuf111[3000] = {0};
-			unsigned char OutDataBuf1111[4] = {0x55,0x55,0x01,0x01};
+			/*	BYTE OutDataBuf111[3000] = {0};
+			BYTE OutDataBuf1111[4] = {0x55,0x55,0x01,0x01};
 			memset(OutDataBuf111, 0,3000);
 			memcpy(OutDataBuf111,OutDataBuf1111,4);
 			memcpy(OutDataBuf111+4,OutDataBuf,DataLenth);*/
@@ -955,7 +955,7 @@ MobileType	 以该类型来去扰
 函数返回值说明: 无
 使用的资源 
 ******************************************/
-void CFSKModem::DisInterference(short *InDataBuf,unsigned long lenth,unsigned char MobileType)
+void CFSKModem::DisInterference(short *InDataBuf,unsigned long lenth,BYTE MobileType)
 {
 	unsigned long i = 0;//指向第i个点
 	unsigned long j = 0;//用于超小波宽度中采样值取反
@@ -1031,11 +1031,11 @@ MmobileType  手机类型
 函数返回值说明:    0:出错，1:没有滤波  2:需要滤波
 使用的资源 
 ******************************************/
-unsigned char   CFSKModem::Demodulate(unsigned char *OutDataBuf, short *InDataBuf,
-									  unsigned long lenth,unsigned long *OutLenIndix,unsigned char MobileType)
+BYTE   CFSKModem::Demodulate(BYTE *OutDataBuf, short *InDataBuf,
+									  unsigned long lenth,unsigned long *OutLenIndix,BYTE MobileType)
 {
-	unsigned char LoopForSmooth = 0;// 0 是第一次，1是第二次
-	unsigned char DemodulationResult = 0;// 找同步头和解调的结果，1为成功，0为失败
+	BYTE LoopForSmooth = 0;// 0 是第一次，1是第二次
+	BYTE DemodulationResult = 0;// 找同步头和解调的结果，1为成功，0为失败
 
 	for(LoopForSmooth = 0;LoopForSmooth < 2; LoopForSmooth++ )
 	{
