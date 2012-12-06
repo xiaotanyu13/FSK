@@ -26,7 +26,8 @@ CFSKModem::CFSKModem()
 {
 	this->m_bIobitFlag = false;
 	this->m_cPackageCount = 0;
-	this->m_fPoint = (float*)malloc(2 * MAX_N_POINTS * sizeof(float));
+	this->m_fPoint = (float*)malloc(2 * MAX_N_POINTS * sizeof(float));//滤波的时候保存数据 
+	// 这个值只在滤波的时候用到了，其他时候都没有用处，这个参数需要具体的讨论一下
 }
 
 /*
