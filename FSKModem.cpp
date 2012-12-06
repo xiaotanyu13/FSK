@@ -735,19 +735,17 @@ BYTE CFSKModem::GetAllData(BYTE *OutDataBuf, short *InDataBuf,
 		if( bitindex == 8 )//8位1字节
 		{
 			printf("%02x,", OutDataBuf[j]);//打印数据
-			if ( OutDataBuf[j] == 0x23)
-			{
-				OutDataBuf[j] =  OutDataBuf[j];
-			}
 			j++;
 			bitindex = 0;
 		}
-		if(( j == 2)&&(bitindex == 0))//一开始两个字节是数据长度
+		if((j == 1) && (bitindex == 0))// 一开始1个字节是计数器
+			this->m_cPackageCount = OutDataBuf[0];
+		if((j == 3)&&(bitindex == 0))// 接下来两个字节是数据长度
 		{
-			DataLenth =  OutDataBuf[0] | (OutDataBuf[1] << 8);
+			DataLenth =  OutDataBuf[1] | (OutDataBuf[2] << 8);
 		}
 		//if(( j == 4)&&(bitindex == 0))
-		if(( j == DataLenth+2) && (j >= 2))//全部解出来了
+		if(( j == DataLenth + 3 + 2) && (j >= 3))//全部解出来了
 		{
 #if 0
 			MaxOf0Wide = (3*MaxOf0Wide/(MobileType + 1)/2);
@@ -766,14 +764,14 @@ BYTE CFSKModem::GetAllData(BYTE *OutDataBuf, short *InDataBuf,
 			}
 #endif
 			/*************************************************************************CRC16**/
-			crc = OutDataBuf[DataLenth] | (OutDataBuf[DataLenth + 1] << 8);
+			crc = OutDataBuf[DataLenth + 3] | (OutDataBuf[DataLenth + 4] << 8);
 
 			/*	BYTE OutDataBuf111[3000] = {0};
 			BYTE OutDataBuf1111[4] = {0x55,0x55,0x01,0x01};
 			memset(OutDataBuf111, 0,3000);
 			memcpy(OutDataBuf111,OutDataBuf1111,4);
 			memcpy(OutDataBuf111+4,OutDataBuf,DataLenth);*/
-			if(crc != this->CalculateCRC(OutDataBuf,DataLenth))//如果校验通不过
+			if(crc != this->CalculateCRC(OutDataBuf+3,DataLenth))//如果校验通不过
 			{			
 				printf("\n CRC error \n");	//打印校验出错
 				*endlen = i;
@@ -1031,7 +1029,7 @@ MmobileType  手机类型
 函数返回值说明:    0:出错，1:没有滤波  2:需要滤波
 使用的资源 
 ******************************************/
-BYTE   CFSKModem::Demodulate(BYTE *OutDataBuf, short *InDataBuf,
+int    CFSKModem::Demodulate(BYTE *OutDataBuf, short *InDataBuf,
 									  unsigned long lenth,unsigned long *OutLenIndix,BYTE MobileType)
 {
 	BYTE LoopForSmooth = 0;// 0 是第一次，1是第二次

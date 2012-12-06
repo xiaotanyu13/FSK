@@ -4,9 +4,7 @@
 #include <iostream>
 #include <time.h>
 #include <stdlib.h>
-
 #include <fstream>
-//#include "FSK_Modem.h"
 #include "FSKModem.h"
 using namespace std;
 
@@ -14,11 +12,11 @@ using namespace std;
 void TestModulate()
 {
 	CFSKModem *fsk = new CFSKModem();
-	char a[4] = {0x01,0x54,0x33,0x45};
-	int len = 4;
+	char a[] = {0x01,0x54,0x33,0x45,0x55};
+	int len = 5;
 	int outLen = 0;
 	short* ss = NULL;
-	ss = fsk->Modulate(a,4,&outLen);
+	ss = fsk->Modulate(a,len,&outLen);
 
 	for(int i = 0; i < outLen; i ++)
 	{
@@ -26,6 +24,7 @@ void TestModulate()
 			cout << endl;
 		cout << ss[i] << " ";
 	}
+	free(ss);
 }
 
 
@@ -66,10 +65,15 @@ unsigned long GetHeadData(void)
 		}
 }
 
-int main()
+int  TestDemodulate()
 {
-	//TestModulate();
 	CFSKModem *fsk = new CFSKModem();
+	char a[] = {0x01,0x54,0x33,0x45,0x55};
+	int len = 5;
+	int outLen = 0;
+	short* ss = NULL;
+	ss = fsk->Modulate(a,len,&outLen);
+
 	unsigned long LenthOfWAV = 0;//WAV文件的长度
 	unsigned long OutLenIndix;//解到哪点了
 
@@ -87,7 +91,8 @@ int main()
 	fread(databuf,1,LenthOfWAV+44,logfile);
 	memcpy( ((char*)databuf+LenthOfWAV+44),databuf,(LenthOfWAV+44));
 	//	int leee = GetValidData(databuf+22,(short *)tempbuf1,LenthOfWAV/2);
-	fsk->Demodulate(retdatabuf, databuf+22,LenthOfWAV/2,&OutLenIndix,1);
+	//fsk->Demodulate(retdatabuf, databuf+22,LenthOfWAV/2,&OutLenIndix,1);
+	fsk->Demodulate(retdatabuf, ss,outLen,&OutLenIndix,3);
 
 	/**********************************************/
 	//保存滤波后的波形
@@ -106,6 +111,17 @@ int main()
 	if(databuf)
 		free(databuf);
 	printf("please entry any key\n");
+	return 0;
+}
 
+
+int main()
+{
+	//TestModulate();
+	
+	//CFSKModem *fsk = new CFSKModem();
+
+	TestDemodulate();
+	
 	return 0;
 }

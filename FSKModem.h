@@ -77,7 +77,7 @@ public:
 
 public:
 	short* Modulate(char* data,int len,int* outFrameLen);		// 调制数据  
-	BYTE   Demodulate(BYTE *OutDataBuf,
+	int    Demodulate(BYTE *OutDataBuf,
 		short *InDataBuf,unsigned long lenth,
 		unsigned long *OutLenIndix,BYTE MobileType);	// 解调数据
 };
