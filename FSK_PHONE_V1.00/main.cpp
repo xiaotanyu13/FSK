@@ -21,8 +21,8 @@ void TestModulate()
 	for(int i = 0; i < outLen; i ++)
 	{
 		if(i % MODULATE_SAMPLE == 0)
-			cout << endl;
-		cout << ss[i] << " ";
+			printf("\n");
+		printf("%d ",ss[i]);
 	}
 	free(ss);
 }
@@ -117,11 +117,11 @@ int  TestDemodulate()
 
 int main()
 {
-	//TestModulate();
+	TestModulate();
 	
 	//CFSKModem *fsk = new CFSKModem();
 
-	TestDemodulate();
+	//TestDemodulate();
 	
 	return 0;
 }

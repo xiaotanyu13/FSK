@@ -29,8 +29,13 @@ typedef unsigned long DWORD;
 short* Modulate(char* data,int len,int* outFrameLen,BYTE MobileType);		// 调制数据  
 int    Demodulate(BYTE *OutDataBuf,
 				  short *InDataBuf,unsigned long lenth,
-				  unsigned long *OutLenIndix);	// 解调数据
+				  unsigned long *OutLenIndix);								// 解调数据
+void  SetSampleLevel(int level);
 
+
+/*
+	wav格式的文件的头44字节数据
+*/
 typedef struct _tagMsWavPcmHeader44{
 	BYTE ChunkID[4]; // "RIFF"; The "RIFF" the mainchunk;
 	unsigned long ChunkSize; // FileSize - 8; The size following this data

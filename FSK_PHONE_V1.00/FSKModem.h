@@ -74,16 +74,19 @@ protected:
 
 public:
 	CFSKModem();
+	~CFSKModem();
 
 public:
-	short* Modulate(char* data,int len,int* outFrameLen);		// 调制数据  
+	short* Modulate(char* data,int len,int* outFrameLen);	// 调制数据  
 	int    Demodulate(BYTE *OutDataBuf,
 		short *InDataBuf,unsigned long lenth,
-		unsigned long *OutLenIndix,BYTE MobileType);	// 解调数据
+		unsigned long *OutLenIndix,BYTE MobileType);		// 解调数据
 };
 
 
-
+/*
+	用来保存wav文件的头
+*/
 typedef struct _tagMsWavPcmHeader44{
 	BYTE ChunkID[4]; // "RIFF"; The "RIFF" the mainchunk;
 	unsigned long ChunkSize; // FileSize - 8; The size following this data
