@@ -18,12 +18,24 @@ xiaot.yu@sunyard.com
 
 // 调制
 
+
 char g_cPackageCount;		// 包计数器，每次发送都会++
-float *g_fPoint;			/* pointer to time-domain samples */
-int g_nSampleLevel;			// 调制的频率等级
 int g_bIobitFlag;			// 用来表示波的正负
 
+int g_nSampleLevel;			// 调制的频率等级
 #define MODULATE_SAMPLE		((g_nSampleLevel + 1) * 2)
+
+/*
+	调整通讯速率
+	输入参数：
+			level：	通讯速率等级有1--9 9种不同的模式
+*/
+void  SetSampleLevel(int level)
+{
+	g_nSampleLevel = level;
+}
+
+
 /*
 
 
@@ -821,29 +833,8 @@ void SmoothingWave(short *InDataBuf,unsigned long length,
 	unsigned long i, j, k, N;
 	long start, end;
 	unsigned long l, h;
-
-	/*
-	unsigned long NumberOfLow = 0;//小幅度波的个数
-	for(;i<length;)
-	{   
-	NumberOfLow = 0;
-	while((InDataBuf[i] < 500)&&(InDataBuf[i] > -500)) //去除 连续 3点小于500的点
-	{
-	i++;
-	NumberOfLow++;
-	if(i == length)
-	{
-	return;
-	}
-	}
-	if(NumberOfLow < 3)//对于中间出现的小幅度波小于3，要退回去
-	{
-	i -= NumberOfLow;
-	}
-	//InDataBuf[i] = (InDataBuf[i - 1] + InDataBuf[i] + InDataBuf[i + 1])/3;
-
-	//i++;		
-	}*/
+	float *g_fPoint;			/* pointer to time-domain samples */// 这个东西至今没有确切的了解是什么，先放着
+	g_fPoint = (float*)malloc(2 * MAX_N_POINTS * sizeof(float));//滤波的时候保存数据 
 
 #if 0
 	for(i = 0; i < length;) {
@@ -918,8 +909,12 @@ void SmoothingWave(short *InDataBuf,unsigned long length,
 			i += end;
 		}
 		else
+		{
+			free(g_fPoint);
 			break;
+		}
 	}
+	free(g_fPoint);
 
 #endif
 }
@@ -1044,7 +1039,7 @@ int    Demodulate(BYTE *OutDataBuf, short *InDataBuf,
 
 	unsigned long lLowF = 0;
 	unsigned long lHighF = 0;
-	int MobileType = 3; // 表示频率5.5k
+	int MobileType = 3; // 表示频率5.5k，解调的频率是固定的
 
 	for(LoopForSmooth = 0;LoopForSmooth < 2; LoopForSmooth++ )
 	{
