@@ -74,6 +74,7 @@ int  TestDemodulate()
 	short* ss = NULL;
 	ss = fsk->Modulate(a,len,&outLen);
 
+	printf("outLen %d \n",outLen);
 	unsigned long LenthOfWAV = 0;//WAV文件的长度
 	unsigned long OutLenIndix;//解到哪点了
 
@@ -86,20 +87,28 @@ int  TestDemodulate()
 
 	unsigned char retdatabuf[2000];//用于存放解出来的数据,最多1.5k
 
-	short *databuf = (short*)malloc((LenthOfWAV+44)*2);//根据长度，申请内存
-	FILE *logfile = fopen("123.wav","rb");
-	fread(databuf,1,LenthOfWAV+44,logfile);
-	memcpy( ((char*)databuf+LenthOfWAV+44),databuf,(LenthOfWAV+44));
+	short *databuf = (short*)malloc(outLen * 2);//根据长度，申请内存
+	FILE *logfile = fopen("234.data","rb");
+	fread(databuf,1,outLen * 2,logfile);
+	//memcpy( ((char*)databuf+LenthOfWAV+44),databuf,(LenthOfWAV+44));
 	//	int leee = GetValidData(databuf+22,(short *)tempbuf1,LenthOfWAV/2);
 	//fsk->Demodulate(retdatabuf, databuf+22,LenthOfWAV/2,&OutLenIndix,1);
-	fsk->Demodulate(retdatabuf, ss,outLen,&OutLenIndix,3);
+	int result = fsk->Demodulate(retdatabuf, databuf,outLen,&OutLenIndix,3);
 
+	printf("OutLenIndix%d  result %d \n",OutLenIndix,result);
+	for(int i = 0;i < 100; i ++)
+	{
+		printf("%02x ",retdatabuf[i]);
+	}
 	/**********************************************/
 	//保存滤波后的波形
-	FILE* file=fopen("234.wav","wb");
+	FILE* file=fopen("234.data","wb");
 	if(file)
 		//		fwrite(tempbuf1,leee*2,1,file);//
-			fwrite(databuf,LenthOfWAV+44,1,file);
+	{
+			fwrite(ss,outLen * 2,1,file);
+			//fwrite(a,len,1,file);
+	}
 	else
 		printf("open 234.wav fail\n");
 	/**********************************************/
@@ -114,14 +123,35 @@ int  TestDemodulate()
 	return 0;
 }
 
+void TestModulateAndDemodulate()
+{
+	CFSKModem *fsk = new CFSKModem();
+	char a[] = {0x01,0x54,0x33,0x45,0x55};
+	int len = 5;
+	int outLen = 0;
+	short* ss = NULL;
+	ss = fsk->Modulate(a,len,&outLen);
+	
+	unsigned char retdatabuf[2000];//用于存放解出来的数据,最多1.5k
+	unsigned long outIndex = 0;
+	int result = fsk->Demodulate(retdatabuf,ss,outLen,&outIndex,3);
+	if(result > 0)
+	{
+		int retdatabuflen = retdatabuf[1] + retdatabuf[2] * 256;
 
+		for(int i = 0; i < retdatabuflen; i ++)
+		{
+			printf("%02x ",retdatabuf[i + 3]);
+		}
+	}
+}
 int main()
 {
-	TestModulate();
+	//TestModulate();
 	
 	//CFSKModem *fsk = new CFSKModem();
 
-	//TestDemodulate();
-	
+	TestDemodulate();
+	//TestModulateAndDemodulate();
 	return 0;
 }

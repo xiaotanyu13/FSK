@@ -628,14 +628,14 @@ BYTE CFSKModem::GetAllData(BYTE *OutDataBuf, short *InDataBuf,
 		LastRatio = RatioOfZorePassage;//保存上一次的过零点比率
 		if(InDataBuf[i] >= 0)//如果采样值大于等于0
 		{
-			while(InDataBuf[i] >= 0)//直到采样值小于0
+			while(InDataBuf[i] >= 0 && i < lenth)//直到采样值小于0
 			{
 				i++;//下一个采样点	
 			}
 		}
 		else//如果采样值小于0
 		{
-			while(InDataBuf[i] < 0)//直到采样值大于0
+			while(InDataBuf[i] < 0 && i < lenth)//直到采样值大于0
 			{
 				i++;//下一个采样点				
 			}
@@ -643,10 +643,6 @@ BYTE CFSKModem::GetAllData(BYTE *OutDataBuf, short *InDataBuf,
 		RatioOfZorePassage = \
 			(float(abs(InDataBuf[i]))) / ( float(abs(InDataBuf[i - 1])) + float(abs(InDataBuf[i])) );
 
-		if(i == 28036)
-		{
-			i = i;
-		}
 		//记下当前波过零点之间的宽度	
 		LengthOfZorePassage =LastRatio  + (i - datastart - 1) + (1 - RatioOfZorePassage);
 		if(( LengthOfZorePassage >=  (3.0/ 2.0)*((float) MobileType+1.0) )
@@ -748,25 +744,8 @@ BYTE CFSKModem::GetAllData(BYTE *OutDataBuf, short *InDataBuf,
 		{
 			DataLenth =  OutDataBuf[1] | (OutDataBuf[2] << 8);
 		}
-		//if(( j == 4)&&(bitindex == 0))
 		if(( j == DataLenth + 3 + 2) && (j >= 3))//全部解出来了
 		{
-#if 0
-			MaxOf0Wide = (3*MaxOf0Wide/(MobileType + 1)/2);
-			MaxOf1Wide = (3*MaxOf1Wide/(MobileType + 1));
-			printf("\nMaxOf0Wide is %f%%\n",(3*MaxOf0Wide/(MobileType + 1)/2)*100);//打印
-			printf("\nMaxOf1Wide is %f%%\n",(3*MaxOf1Wide/(MobileType + 1))*100);//打印
-			for(k = 2; k < DataLenth+1; k++)//计算校验，除长度之外，全部异或
-			{
-				crc ^= OutDataBuf[k];
-			}						
-			if(crc != OutDataBuf[DataLenth + 1])//如果校验通不过
-			{			
-				printf("\n CRC error \n");	//打印校验出错
-				*endlen = i;
-				return 0;//校验出错
-			}
-#endif
 			/*************************************************************************CRC16**/
 			crc = OutDataBuf[DataLenth + 3] | (OutDataBuf[DataLenth + 4] << 8);
 
@@ -1043,7 +1022,7 @@ int    CFSKModem::Demodulate(BYTE *OutDataBuf, short *InDataBuf,
 	{
 		if(LoopForSmooth == 1)//两次循环，先不滤波，解不出来再滤波。
 		{
-			printf("start Smoothing wave\n");//
+			printf("start Smoothing wave\n");
 			unsigned long lLowF = 0;
 			unsigned long lHighF = 0;
 			lLowF = (unsigned long)((float)(2000*2/(MobileType+1))*(float)(1.0/32.0 * (float)(MobileType+1)+15.0/16.0));
